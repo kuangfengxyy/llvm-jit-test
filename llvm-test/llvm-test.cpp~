@@ -1,0 +1,31 @@
+#include <string>
+#include <memory>
+#include <iostream>
+
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/Target/TargetSelect.h>
+#include <llvm/Bitcode/ReaderWriter.h>
+#include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/ModuleProvider.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/ExecutionEngine/JIT.h>
+
+using namespace std;
+using namespace llvm;
+
+int main()
+{
+    InitializeNativeTarget();
+    llvm_start_multithreaded();
+    LLVMContext context;
+    string error;
+    Module *m = ParseBitcodeFile(MemoryBuffer::getFile("tst.bc"), context, &error);
+    ExecutionEngine *ee = ExecutionEngine::create(m);
+
+    Function* func = ee->FindFunctionNamed("main");
+
+    typedef void (*PFN)();
+    PFN pfn = reinterpret_cast<PFN>(ee->getPointerToFunction(func));
+    pfn();
+    delete ee;
+}
