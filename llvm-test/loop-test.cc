@@ -4,9 +4,12 @@
 // which is used by the unit test to exercise loading precompiled
 // ir.
 #include <stdio.h>
+#include <vector>
+
 
 __attribute__ ((noinline)) void DefaultImplementation() {
-  printf("Default\n");
+  std::vector<int> v;
+  printf("%d, Default\n", v.size());
 }
 
 void TestLoop(int n) {
