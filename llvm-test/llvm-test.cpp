@@ -21,8 +21,14 @@ int main()
 
     LLVMContext context;
     string error;
-    Module *m = *parseBitcodeFile(MemoryBuffer::getFile("loop-test.bc").get()->getMemBufferRef(), context);
-    //ExecutionEngine *ee = ExecutionEngine::createJIT(m);
+    Module *m = *parseBitcodeFile(MemoryBuffer::getFile("loop-test.bc")->get()->getMemBufferRef(), context);
+    if (m == NULL) {
+        cout << "create Module fail" << endl;
+        exit(1);
+    }
+    //ExecutionEngine *ee = EngineBuilder(unique_ptr<Module>(m)).create();
+    //Function* func = ee->FindFunctionNamed("DefaultImplementation");
+    //Module *m = *parseBitcodeFile(MemoryBuffer::getFile("loop-test.bc").get()->getMemBufferRef(), context);
     ExecutionEngine *ee = EngineBuilder(unique_ptr<Module>(m)).setEngineKind(EngineKind::JIT).setErrorStr(&error).create();
     if (ee == NULL) {
         cout<< "error createJIT : " << error<< endl;
@@ -55,7 +61,7 @@ int main()
     typedef void (*PFN2)(int);
     PFN pfn = reinterpret_cast<PFN>(ee->getPointerToFunction(funcDefaultImplementation));
     PFN2 pfn2 = reinterpret_cast<PFN2>(ee->getPointerToFunction(FuncTestLoop));
-    //pfn();
     pfn2(3);
+    cout << "done pfn\n";
     delete ee;
 }
