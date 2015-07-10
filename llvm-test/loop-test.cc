@@ -9,7 +9,7 @@
 
 __attribute__ ((noinline)) void DefaultImplementation() {
   std::vector<int> v;
-  printf("%d, Default\n", v.size());
+  printf("%zu, Default\n", v.size());
 }
 
 void TestLoop(int n) {

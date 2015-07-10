@@ -34,8 +34,10 @@ int main()
         cout<< "error createJIT : " << error<< endl;
         exit(1);
     }
-    //Function* func = ee->FindFunctionNamed("DefaultImplementation");
-    printf("%d functions\n", m->getFunctionList().size());
+    uint64_t func = ee->getFunctionAddress("DefaultImplementation");
+    printf("getFunctionAddress is : %ld\n", func);
+
+    printf("%ul functions\n", m->getFunctionList().size());
     Function* funcDefaultImplementation;
     Function* FuncTestLoop;
     Module::iterator it = m->getFunctionList().begin();
@@ -53,7 +55,7 @@ int main()
         } 
         it++;
     }
-    printf("%ld,%ld\n", funcDefaultImplementation, FuncTestLoop);
+    printf("%p,%p\n", funcDefaultImplementation, FuncTestLoop);
     // 重要：重定向符号，否则找不到符号引用，导致空指针segment fault
     ee->finalizeObject();
 
