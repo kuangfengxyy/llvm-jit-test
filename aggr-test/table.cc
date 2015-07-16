@@ -17,7 +17,7 @@ struct column_meta {
 };
 typedef struct column_meta column_meta_t;
 class Table {
-private:
+public:
     std::vector<column_meta_t> _metas;
     std::vector<uint32_t> _pos;
     std::vector<char*> _rows;
@@ -115,6 +115,10 @@ uint64_t Table::calc_hash(char* row) {
     return hash;
 }
 void Table::aggrRow(char* row, char* rowto) {
+    if (_codegen_agg_fun != NULL) {
+        _codegen_agg_fun(row, rowto);
+        return;
+    }
     for (uint32_t i = _key_size; i < _metas.size(); ++i) {
         switch (_metas[i].type) {
             case ULONG:
@@ -124,6 +128,9 @@ void Table::aggrRow(char* row, char* rowto) {
             case UINT:
             case INT:
                 *(int32_t*) (rowto + _pos[i]) += *(int32_t*)(row + _pos[i]);
+                break;
+            case DOUBLE:
+                *(double*) (rowto + _pos[i]) += *(double*)(row + _pos[i]);
                 break;
             case STRING:
                 *(char**)(rowto + _pos[i]) = *(char**)(row + _pos[i]);
